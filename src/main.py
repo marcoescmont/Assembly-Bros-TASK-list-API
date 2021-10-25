@@ -9,6 +9,7 @@ from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
 from models import db, User
+import json
 #from models import Person
 
 app = Flask(__name__)
@@ -38,6 +39,34 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
+todos = [
+    { "label": "My first task", "done": False },
+    { "label": "My second task", "done": False }
+]
+
+@app.route('/marcoescmont', methods=['GET'])
+def hello_world():
+    return jsonify(todos)
+
+@app.route('/marcoescmont', methods=['POST'])
+def add_new_todo():
+    request_body = json.loads(request.data)
+    todos.append(request_body)
+    return jsonify(todos)
+
+@app.route('/marcoescmont', methods=['PUT'])
+def update_todo():
+    global todos
+    incoming_todos = json.loads(request.data)
+    todos = incoming_todos
+    return jsonify(todos)
+
+@app.route('/marcoescmont/<int:position>', methods=['DELETE'])
+def delete_todo(position):
+    del todos[position]
+    return jsonify(todos)
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
